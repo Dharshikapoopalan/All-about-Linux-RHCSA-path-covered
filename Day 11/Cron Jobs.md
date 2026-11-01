@@ -19,19 +19,7 @@ You don't want to log in and run these commands manually every time. You schedul
 3. Execute
   - At the scheduled time, cron starts the configured command or script.
 
-Important terminology
-
-Term	            Meaning
-
-cron	           The time-based job scheduling system
-
-crontab	         A file or command used to configure cron schedules
-
-crond	           The background cron daemon on many Linux distributions
-
-Cron job	       The scheduled command or script
-
-Daemon	         A background process that provides a service
+<img width="703" height="286" alt="image" src="https://github.com/user-attachments/assets/2a9f3ad3-21a3-499b-be0c-ec14531ae43a" />
 
 On Red Hat Enterprise Linux (RHEL), which is relevant to RHCSA, the service is generally named crond.
 
@@ -41,19 +29,8 @@ A standard user's crontab entry has five time fields followed by a command.
 
 <img width="1350" height="536" alt="image" src="https://github.com/user-attachments/assets/ceef01e2-6031-4af1-b3f0-7d78ff626272" />
 
-Field	          Allowed values	      Example
+<img width="734" height="290" alt="image" src="https://github.com/user-attachments/assets/d7335405-b8b9-45eb-917c-bcac3befcc11" />
 
-Minute	          0–59	                30
-
-Hour	            0–23	                 8
-
-Day of month	    1–31	                15
-
-Month	            1–12	                 6
-
-Day of week	      0–7	                 1 for Monday on common Linux cron implementations
-
-- The asterisk * means every permitted value for that field.
   
 - Runs the date every minute.
 
@@ -102,37 +79,7 @@ There are five especially important scheduling symbols and operators.
 
 These examples use the standard five-field cron format.
 
-Requirement	                  Cron expression
-
-Every minute	                            * * * * *
-
-Every 5 minutes	                          */5 * * * *
-
-Every 15 minutes	                        */15 * * * *
-
-Every 30 minutes	                        */30 * * * *
-
-Every hour	                              0 * * * *
-
-Every day at 12 AM	                      0 0 * * *
-
-Every day at 6 AM	                        0 6 * * *
-
-Every day at 11:30 PM	                    30 23 * * *
-
-Every Monday at 9 AM	                    0 9 * * 1
-
-Every Friday at 5:30 PM	                  30 17 * * 5
-
-First day of each month at midnight	      0 0 1 * *
-
-Every three months, on the first day	    0 0 1 */3 *
-
-Every day at 8 AM and 8 PM	              0 8,20 * * *
-
-Monday–Friday at 8 AM	                    0 8 * * 1-5
-
-Every Sunday at 2 AM	                    0 2 * * 0
+<img width="593" height="505" alt="image" src="https://github.com/user-attachments/assets/aa63c573-014a-40a8-a335-afb54741f51e" />
 
 **4. How to create a cron job**
 
@@ -177,17 +124,7 @@ If it has run successfully, you'll see timestamps in the file.
 
 Other useful crontab commands
 
-Command	                      Purpose
-
-crontab -e	                   Edit your user's jobs
-
-crontab -l	                   List your user's jobs
-
-crontab -r	                   Remove all of your user's cron jobs
-
-crontab -u alice -l	           List Alice's jobs as an authorized administrator
-
-crontab -u alice -e	           Edit Alice's jobs as an authorized administrator
+<img width="585" height="209" alt="image" src="https://github.com/user-attachments/assets/b927ca47-b16e-4ba6-b891-e1cec22e3866" />
 
 Warning: crontab -r deletes the entire crontab for that user. Always list and back up the entries before removing them.
 
