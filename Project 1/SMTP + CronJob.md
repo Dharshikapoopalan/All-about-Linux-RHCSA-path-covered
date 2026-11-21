@@ -1,363 +1,304 @@
-**Server Health Monitoring using Bash Script, Cron Job, and SMTP**
+# Linux Server Health Monitoring & Email Alert Automation
 
-Project Overview
+## Project Overview
 
-This project automates server health monitoring on a CentOS Linux virtual machine.
+This project demonstrates Linux server health monitoring and email notification automation using Bash scripting and Postfix.
 
-The solution uses:
+A Bash script (`healthcheck.sh`) is created to automate server health checks and generate a health-check report. Postfix is configured as the mail transfer agent (MTA) to send the generated reports through Gmail SMTP.
 
-  - Bash Scripting to collect server health information
-  - Postfix SMTP to send emails
-  - Gmail SMTP Relay for email delivery
-  - Cron Jobs for automation
+The objective is to monitor a Linux server, automate health-check reporting, and receive email notifications without manually checking the server every time.
 
-The script gathers server health details such as:
+## Project Objectives
 
-Date & Time
-Hostname
-Uptime
-Memory Usage
-Disk Usage
-CPU Load
+- Create a Bash script for Linux server health monitoring.
+- Automate health-check report generation.
+- Install and configure Postfix as the mail transfer agent.
+- Configure Gmail SMTP relay for outgoing email notifications.
+- Configure SASL authentication for secure SMTP communication.
+- Enable and manage Linux services using systemctl.
+- Verify email delivery and troubleshoot mail logs.
+- Prepare the environment for scheduled health-check execution using Cron.
 
-and sends the report to a configured email address automatically.
+## Technologies & Tools Used
 
-Architecture
+| Technology | Purpose |
+|---|---|
+| Linux (CentOS/RHEL) | Operating system |
+| Bash Shell Scripting | Health-check automation |
+| Postfix | Mail Transfer Agent |
+| Gmail SMTP | Email delivery |
+| Cyrus SASL | SMTP authentication |
+| Cron / Crond | Scheduled task management |
+| Mailx | Sending email from the terminal |
+| Nmap-Ncat | Network connectivity testing |
+| systemctl | Service management |
 
-Plain Text
+## Project Architecture
+             Linux Server (CentOS/RHEL)
+                        |
+                        |
+                healthcheck.sh
+                        |
+                        |
+              Generate Health Report
+                        |
+                        |
+                  Postfix MTA
+                        |
+                        |
+                SASL Authentication
+                        |
+                        |
+                Gmail SMTP Relay
+                 smtp.gmail.com:587
+                        |
+                        |
+                 Email Notification
+                        |
+                        |
+             aieraversion@gmail.com
+```
 
-Bash Script
-|
-v
+## Implementation Steps
 
-Collect System Health Data
-|
-v
+### Step 1: Verify the Linux Environment
 
-Postfix SMTP Client
-|
-v
+Check the existing files and directories.
 
-Gmail SMTP Server
-|
-v
-
-Email Notification
-|
-v
-
-Recipient Inbox
-
-Command-by-Command Explanation
-
-
-date
-
-Purpose: Displays the current system date and time.
-
-Output Example:
-
-Plain Text
-Thu Jul 17 14:10:23 UTC 2025
-Check Cron Service Status
-Shell
-systemctl status crond
-
-Purpose: Verifies whether the cron daemon is running.
-
-Cron is responsible for executing scheduled jobs automatically.
-
-Print Current Working Directory
-Shell
-pwd
-
-Purpose: Shows the current directory location.
-
-Example:
-
-Plain Text
-/root
-Create/Edit Bash Script
-Shell
-vim healthcheck.sh
-
-Purpose: Creates or edits the health monitoring script.
-
-Verify Script Creation
-Shell
+```bash
 ls -l
+ll
+```
 
-Purpose: Lists files and their permissions.
+### Step 2: Create the Health Check Script
 
-Make Script Executable
-Shell
-chmod +x /root/healthcheck.sh
+Create or edit the Bash health-check script.
 
-Purpose: Adds execute permissions to the script.
-
-Before:
-
-Plain Text
--rw-r--r--
-
-After:
-
-Plain Text
--rwxr-xr-x
-Execute Script Manually
-Shell
-sudo /root/healthcheck.sh
-
-Purpose: Runs the script manually to verify functionality.
-
-Postfix Installation and Configuration
-Install Postfix Mail Server
-Shell
-sudo yum install postfix -y
-
-Purpose: Installs the Postfix SMTP server package.
-
-Enable Postfix at Boot
-Shell
-sudo systemctl enable postfix
-
-Purpose: Starts Postfix automatically whenever the server reboots.
-
-Start Postfix Service
-Shell
-sudo systemctl start postfix
-
-Purpose: Launches the Postfix mail service.
-
-Verify Postfix Status
-Shell
-systemctl status postfix
-
-Purpose: Checks whether Postfix is running successfully.
-
-SASL Authentication Setup
-Install SASL Authentication Package
-Shell
-sudo yum install cyrus-sasl-plain -y
-
-Purpose: Allows Postfix to authenticate with Gmail SMTP.
-
-Edit Script Again
-Shell
+```bash
 vim healthcheck.sh
+```
 
-Purpose: Modify email functionality or add health checks.
+The script is responsible for performing server health checks and generating a report.
 
-Create SMTP Credentials File
-Shell
+The script can be extended to monitor:
+
+- CPU utilization
+- Memory utilization
+- Disk space utilization
+- Filesystem status
+- Running services
+- Server uptime
+- Network connectivity
+
+
+### Step 3: Install Postfix
+
+Install Postfix using the package manager.
+
+```bash
+sudo yum install postfix -y
+```
+
+Enable and start the Postfix service.
+
+```bash
+sudo systemctl enable postfix
+sudo systemctl start postfix
+```
+
+Verify the service status.
+
+```bash
+systemctl status postfix
+```
+
+### Step 4: Install SMTP Authentication Packages
+
+Install Cyrus SASL authentication support.
+
+```bash
+sudo yum install cyrus-sasl-plain -y
+```
+
+### Step 5: Install Cron, Mailx and Network Utilities
+
+Install the required packages.
+
+```bash
+dnf install -y cronie mailx
+```
+
+Enable and start the Cron service.
+
+```bash
+systemctl enable --now crond
+```
+
+Install Nmap-Ncat.
+
+```bash
+dnf install -y nmap-ncat
+```
+
+### Step 6: Configure Gmail SMTP Authentication
+
+Open the Postfix SASL password configuration file.
+
+```bash
 vim /etc/postfix/sasl_passwd
+```
 
-Purpose: Stores Gmail authentication credentials.
+Add the Gmail SMTP authentication entry using your Gmail address and a Gmail App Password.
 
-Example:
+```text
+[smtp.gmail.com]:587 YOUR_GMAIL_ADDRESS:YOUR_GMAIL_APP_PASSWORD
+```
 
-Shell
-[smtp.gmail.com]:587 username@gmail.com:app_password
-Secure Credentials File
-Shell
+**Important:** Never upload your actual Gmail App Password or SMTP credentials to GitHub.
+
+Set secure file permissions.
+
+```bash
 chmod 600 /etc/postfix/sasl_passwd
+```
 
-Purpose: Restricts access to the file.
+Generate the Postfix lookup database.
 
-Permissions:
-
-Plain Text
-rw-------
-Generate Postfix Database
-Shell
+```bash
 postmap /etc/postfix/sasl_passwd
+```
 
-Purpose: Creates a hashed database for Postfix authentication.
+### Step 7: Configure Postfix Gmail SMTP Relay
 
-Creates:
+Configure Postfix to use Gmail as the outgoing SMTP relay.
 
-Plain Text
-/etc/postfix/sasl_passwd.db
-Configure Gmail Relay
-Set Gmail SMTP Host
-Shell
+```bash
 postconf -e "relayhost = [smtp.gmail.com]:587"
 
-Purpose: Routes outgoing mail through Gmail.
-
-Enable TLS
-Shell
 postconf -e "smtp_use_tls = yes"
 
-Purpose: Encrypts SMTP traffic.
-
-Enforce Encryption
-Shell
 postconf -e "smtp_tls_security_level = encrypt"
 
-Purpose: Requires encrypted communication.
-
-Enable SMTP Authentication
-Shell
 postconf -e "smtp_sasl_auth_enable = yes"
 
-Purpose: Allows Gmail authentication.
-
-Disable Anonymous Authentication
-Shell
-postconf -e "smtp_sasl_security_options = noanonymous"
-
-Purpose: Allows only authenticated users.
-
-Specify CA Certificates
-Shell
-postconf -e "smtp_tls_CAfile = /etc/pki/tls/certs/ca-bundle.crt"
-
-Purpose: Provides trusted SSL certificates.
-
-Restart Postfix
-Shell
-systemctl restart postfix
-
-Purpose: Applies configuration changes.
-
-Verify Postfix Again
-Shell
-systemctl status postfix
-
-Purpose: Confirms successful restart.
-
-SMTP Testing
-Send Test Email
-Shell
-echo "This is a test email from my CentOS VM" | mail -s "CentOS SMTP Test" aieraversion@gmail.com
-
-Purpose: Tests email delivery through Gmail SMTP.
-
-Execute Monitoring Script
-Shell
-/root/healthcheck.sh
-
-Purpose: Runs the actual health-check script.
-
-Check Mail Logs
-Shell
-tail -50 /var/log/maillog
-
-Purpose: Shows the latest mail processing logs.
-
-Useful for troubleshooting delivery issues.
-
-Troubleshooting Steps
-Check CentOS Version
-Shell
-cat /etc/centos-release
-
-Purpose: Displays operating system version.
-
-Check Installed Postfix Packages
-Shell
-rpm -qa | grep postfix
-
-Purpose: Lists installed Postfix-related packages.
-
-Install LMDB Support Package
-Shell
-sudo dnf install postfix-hash -y
-
-Purpose: Provides database map support required by newer Postfix versions.
-
-Display Supported Postfix Database Types
-Shell
-postconf -m
-
-Purpose: Lists all map types supported by Postfix.
-
-Example:
-
-Plain Text
-hash
-lmdb
-btree
-Create LMDB Database
-Shell
-postmap lmdb:/etc/postfix/sasl_passwd
-
-Purpose: Creates LMDB formatted credential database.
-
-Update Postfix Authentication Mapping
-Shell
 postconf -e "smtp_sasl_password_maps = lmdb:/etc/postfix/sasl_passwd"
 
-Purpose: Instructs Postfix to use LMDB authentication files.
+postconf -e "smtp_sasl_security_options = noanonymous"
 
-Verify Credential Files
-Shell
-ls -l /etc/postfix/sasl_passwd*
+postconf -e "smtp_tls_CAfile = /etc/pki/tls/certs/ca-bundle.crt"
+```
 
-Purpose: Confirms database files were generated.
+Restart Postfix to apply the configuration.
 
-Re-Edit Credentials
-Shell
-vim /etc/postfix/sasl_passwd
-
-Purpose: Correct Gmail credentials if needed.
-
-Force IPv4 Usage
-Shell
-sudo postconf -e "inet_protocols = ipv4"
-
-Purpose: Avoids IPv6 connectivity issues with Gmail SMTP.
-
-Restart and Verify
-Shell
+```bash
 systemctl restart postfix
+```
+
+Verify Postfix.
+
+```bash
 systemctl status postfix
+```
 
-Purpose: Applies configurations and validates service health.
+### Step 8: Test Email Delivery
 
-Network Connectivity Test
-Install Netcat
-Shell
-sudo dnf install nmap-ncat -y
+Send a test email from the Linux server.
 
-Purpose: Installs network testing tools.
+```bash
+echo "This is a test email from my CentOS VM" | mail -s "CentOS SMTP Test" aieraversion@gmail.com
+```
 
-Test Gmail SMTP Port
-Shell
-nc -4 -vz smtp.gmail.com 587
+This verifies that the server can submit an email through the configured mail system.
 
-Purpose: Verifies connectivity to Gmail SMTP server.
+### Step 9: Execute the Health Check Script
 
-Successful Output:
+Execute the Bash health-check script.
 
-Plain Text
-Connection to smtp.gmail.com 587 port [tcp/submission] succeeded!
-Final SMTP Verification
-Shell
-echo "CentOS SMTP test successful" | mail -s "SMTP Test" aieraversion@gmail.com
+```bash
+sudo /root/healthcheck.sh
+```
 
-Purpose: Final end-to-end validation of email delivery.
+The script should generate the health-check report and send the notification using the configured email mechanism.
 
-Sample Cron Job
+### Step 10: Monitor Mail Logs
 
-Open cron table:
+Check the Postfix mail logs to verify email processing and identify possible delivery errors.
 
-Shell
-crontab -e
+```bash
+tail -50 /var/log/maillog
+```
 
-Add:
+## Configuration Verification Commands
 
-Shell
-0 * * * * /root/healthcheck.sh
+Check the Postfix configuration:
 
-Explanation:
+```bash
+postconf -n
+```
 
-Plain Text
-0 = Minute
-* = Every Hour
-* = Every Day
-* = Every Month
-* = Every Weekday
+Check available Postfix lookup database types:
 
-This runs the script every hour.
+```bash
+postconf -m
+```
+
+Check the Postfix service:
+
+```bash
+systemctl status postfix
+```
+
+Check the Cron service:
+
+```bash
+systemctl status crond
+```
+
+Check mail logs:
+
+```bash
+tail -50 /var/log/maillog
+```
+
+## Security Considerations
+
+- Never commit Gmail App Passwords or authentication credentials to GitHub.
+- Restrict access to SMTP authentication files using appropriate Linux permissions.
+- Use TLS encryption for SMTP communication.
+- Avoid storing passwords directly inside Bash scripts.
+- Use environment variables or secure credential storage where appropriate.
+- Review mail logs regularly to identify delivery failures.
+
+## Expected Outcome
+
+After completing the configuration:
+
+1. The Linux server can execute the health-check Bash script.
+2. The script can generate a server health report.
+3. Postfix handles outgoing email communication.
+4. Gmail SMTP relay provides external email delivery.
+5. Health-check notifications can be delivered to the configured recipient.
+6. Mail logs can be used to troubleshoot email delivery issues.
+
+## Skills Demonstrated
+
+- Linux System Administration
+- Bash Shell Scripting
+- Linux Service Management
+- SMTP Configuration
+- Postfix Administration
+- Gmail SMTP Integration
+- SASL Authentication
+- Linux Package Management
+- Cron Job Management
+- Troubleshooting and Log Analysis
+
+---
+
+**Project:** Linux Server Health Monitoring & Email Alert Automation
+
+**Category:** Linux Administration / Automation / DevOps
+
+**Author:** Dharshika
+
+**Email Notification Recipient:** aieraversion@gmail.com
